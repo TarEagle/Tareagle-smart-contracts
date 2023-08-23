@@ -3,12 +3,15 @@ import "@nomicfoundation/hardhat-toolbox";
 import dotenv from 'dotenv';
 dotenv.config();
 
+
 const { API_URL, PRIVATE_KEY } = process.env;
+
+
 const config: HardhatUserConfig = {
-  solidity: "0.8.18",
+  solidity: "0.8.0",
   networks: {
     polygon: {
-      url: "https://polygon-mumbai.g.alchemy.com/v2/x5CxkSPFltlV8IbifVwoFjkmIKrLbMDK",
+      url: "https://rpc-mumbai.maticvigil.com/",
       chainId: 80001,
       accounts: [`0x${PRIVATE_KEY}`]
     }

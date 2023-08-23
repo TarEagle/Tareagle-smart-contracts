@@ -1,30 +1,20 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-contract Eagle {
-    string public name = "Token for Social Causes";
-    string public symbol = "EAGLE";
-    uint8 public decimals = 18;
-    uint256 public totalSupply;
-    mapping(address => uint256) public balances;
+import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
 
-    address public tareagleContract;
+contract Eagle is ERC20, Ownable {
+    mapping(address => bool) public minters;
 
-    constructor(address _tareagleContract) {
-        tareagleContract = _tareagleContract;
+    constructor() ERC20("Eagle Token", "EAGLE") {}
+
+    function setMinter(address _minter, bool _canMint) external onlyOwner {
+        minters[_minter] = _canMint;
     }
 
-    modifier onlyTAREAGLE() {
-        require(msg.sender == tareagleContract, "Only TAREAGLE can mint");
-        _;
+    function mint(address account, uint256 amount) external {
+        require(minters[msg.sender], "Not authorized to mint");
+        _mint(account, amount);
     }
-
-    function mint(address account, uint256 amount) external onlyTAREAGLE returns (bool) {
-        totalSupply += amount;
-        balances[account] += amount;
-        emit Minted(account, amount);
-        return true;
-    }
-
-    event Minted(address indexed account, uint256 amount);
 }

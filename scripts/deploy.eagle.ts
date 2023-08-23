@@ -1,22 +1,17 @@
-import { ethers } from "hardhat";
+const hre = require("hardhat");
 
 async function main() {
+    const EagleFactory = await hre.ethers.getContractFactory("Eagle");
+    const eagle = await EagleFactory.deploy();
+    await eagle.deployed();
 
-  const addresTareagle = "0x833D5b1B3aa49aCbFD4FC8275359a5BEE0e53f71";
-
-  const Eagle = await ethers.getContractFactory("Eagle");
-  const eagle = await Eagle.deploy(addresTareagle);
-
-  await eagle.deployed();
-
-  console.log(
-    `Eagle deployed to ${eagle.address}`
-  );
+    console.log("Eagle deployed to:", eagle.address);
 }
 
-// We recommend this pattern to be able to use async/await everywhere
-// and properly handle errors.
-main().catch((error) => {
-  console.error(error);
-  process.exitCode = 1;
-});
+main()
+    .then(() => process.exit(0))
+    .catch(error => {
+        console.error(error);
+        process.exit(1);
+    });
+export {} 
