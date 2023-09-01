@@ -1,3 +1,4 @@
+
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
@@ -5,27 +6,34 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "./Tar.sol";
 import "./Eagle.sol";
 
-contract TarEagle {
-    Tar public tarToken;
-    Eagle public eagleToken;
-    IERC20 public usdtToken;
+contract tarEagle {
+    IERC20 public usdt;
+    Tar public tar;
+    Eagle public eagle;
 
-    uint256 public tarPrice = 1 ether; // 1 TAR = 1 USDT
-
-    constructor(address _usdtAddress) {
-        tarToken = new Tar(address(this));
-        eagleToken = new Eagle(address(this));
-        usdtToken = IERC20(_usdtAddress);
+    constructor(address _usdt, address _tar, address _eagle) {
+        usdt = IERC20(_usdt);
+        tar = Tar(_tar);
+        eagle = Eagle(_eagle);
     }
 
-    function buyTAR(uint256 tarAmount) external {
-        uint256 totalCost = tarAmount * tarPrice; 
+    function buyTAR(uint256 amount) public {
+        // Transfer USDT from buyer to this contract
+        require(usdt.transferFrom(msg.sender, address(this), amount), "USDT transfer failed");
+        
+        // Transfer TAR to buyer
+        require(tar.transfer(msg.sender, amount), "TAR transfer failed");
+        
+        // Mint and transfer 1% of TAR amount in EAGLE to the buyer
+        uint256 eagleAmount = amount / 100;
+        eagle.mint(msg.sender, eagleAmount);
+    }
 
-        usdtToken.transferFrom(msg.sender, address(this), totalCost); 
+    function mintTAR(uint256 amount) public {
+        tar.mint(msg.sender, amount);
+    }
 
-        tarToken.transfer(msg.sender, tarAmount); // Transferimos los TAR al comprador
-
-        uint256 eagleAmount = tarAmount / 100; // Calculamos la cantidad de EAGLE (1% de la cantidad de TAR)
-        eagleToken.mint(msg.sender, eagleAmount); // Emitimos EAGLE al comprador
+    function mintEagle(uint256 amount) public {
+        eagle.mint(msg.sender, amount);
     }
 }
